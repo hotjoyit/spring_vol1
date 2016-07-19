@@ -8,11 +8,10 @@ import java.sql.*;
  * Created by hotjoyit on 2016-07-19
  */
 public class UserDao {
-  // 관심사의 분리 : Connection 생성기능을 클래스로 분리
   private ConnectionMaker connectionMaker;
 
-  public UserDao(){
-    this.connectionMaker = new ZConnectionMaker();
+  public UserDao(ConnectionMaker connectionMaker){
+    this.connectionMaker = connectionMaker;
   }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
