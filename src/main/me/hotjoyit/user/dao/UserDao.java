@@ -8,9 +8,15 @@ import java.sql.*;
  * Created by hotjoyit on 2016-07-19
  */
 public abstract class UserDao {
-  // 같은 코드가 중복으로 등장하는 문제, 하나의 메소드에서 여러 기능을 수행하는 문제가 존재
+  // 관심사의 분리 : Connection 생성기능을 클래스로 분리
+  private SimpleConnectionMaker simpleConnectionMaker;
+
+  public UserDao(){
+    this.simpleConnectionMaker = new SimpleConnectionMaker();
+  }
+
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Connection c= getConnection();
+    Connection c= simpleConnectionMaker.makeNewConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id, name, password) values(?, ?, ?)");
@@ -25,7 +31,7 @@ public abstract class UserDao {
   }
 
   public User get(String id)throws ClassNotFoundException, SQLException {
-    Connection c = getConnection();
+    Connection c = simpleConnectionMaker.makeNewConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");
@@ -44,8 +50,5 @@ public abstract class UserDao {
 
     return user;
   }
-
-  // 템플릿 메소드 패턴 
-  public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 
 }
