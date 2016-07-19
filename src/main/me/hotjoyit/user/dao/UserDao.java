@@ -7,16 +7,16 @@ import java.sql.*;
 /**
  * Created by hotjoyit on 2016-07-19
  */
-public abstract class UserDao {
+public class UserDao {
   // 관심사의 분리 : Connection 생성기능을 클래스로 분리
-  private SimpleConnectionMaker simpleConnectionMaker;
+  private ConnectionMaker connectionMaker;
 
   public UserDao(){
-    this.simpleConnectionMaker = new SimpleConnectionMaker();
+    this.connectionMaker = new ZConnectionMaker();
   }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Connection c= simpleConnectionMaker.makeNewConnection();
+    Connection c = connectionMaker.makeConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id, name, password) values(?, ?, ?)");
@@ -31,7 +31,7 @@ public abstract class UserDao {
   }
 
   public User get(String id)throws ClassNotFoundException, SQLException {
-    Connection c = simpleConnectionMaker.makeNewConnection();
+    Connection c = connectionMaker.makeConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");

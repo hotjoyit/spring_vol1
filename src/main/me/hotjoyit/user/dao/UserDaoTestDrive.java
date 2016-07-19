@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class UserDaoTestDrive {
 
   public static void main(String[] args) throws ClassNotFoundException, SQLException {
-    UserDao dao = new ZUserDao();
+    UserDao dao = new UserDao();
 
     User user= new User();
     user.setId("hotjoyit");
