@@ -10,8 +10,7 @@ import java.sql.*;
 public class UserDao {
   // 같은 코드가 중복으로 등장하는 문제, 하나의 메소드에서 여러 기능을 수행하는 문제가 존재
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Class.forName("com.mysql.jdbc.Driver");
-    Connection c= DriverManager.getConnection("jdbc:mysql://localhost/toby_spring", "hotjoyit", "pwhotjoyit");
+    Connection c= getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "insert into users(id, name, password) values(?, ?, ?)");
@@ -26,8 +25,7 @@ public class UserDao {
   }
 
   public User get(String id)throws ClassNotFoundException, SQLException {
-    Class.forName("com.mysql.jdbc.Driver");
-    Connection c = DriverManager.getConnection("jdbc:mysql://localhost/toby_spring", "hotjoyit", "pwhotjoyit");
+    Connection c = getConnection();
 
     PreparedStatement ps = c.prepareStatement(
         "select * from users where id = ?");
@@ -45,6 +43,13 @@ public class UserDao {
     c.close();
 
     return user;
+  }
+
+  // 메소드 추출 리팩토링
+  private Connection getConnection() throws ClassNotFoundException, SQLException {
+    Class.forName("com.mysql.jdbc.Driver");
+    Connection c = DriverManager.getConnection("jdbc:mysql://localhost/toby_spring", "hotjoyit", "pwhotjoyit");
+    return c;
   }
 
 }
