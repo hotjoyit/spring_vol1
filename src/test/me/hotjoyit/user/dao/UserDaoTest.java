@@ -1,10 +1,12 @@
 package me.hotjoyit.user.dao;
 
 import me.hotjoyit.user.domain.User;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.SQLDataException;
 import java.sql.SQLException;
@@ -15,15 +17,15 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by hotjoyit on 2016-07-20
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(value = "/applicationContext.xml")
 public class UserDaoTest {
 
+  // UserDaoTest 객체는 Test마다 새로 생성하지만 JUnit 테스트 컨텍스트 프레임워크에서 관리하는 Bean들은 한 번만 생성된다
+  @Autowired
+  private ApplicationContext context;
+  @Autowired
   private UserDao dao;
-
-  @Before
-  public void setUp() {
-    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-    this.dao = context.getBean("userDao", UserDao.class);
-  }
 
   @Test
   public void addAndGet() throws SQLException {
