@@ -1,6 +1,7 @@
 package me.hotjoyit.user.dao;
 
 import me.hotjoyit.user.domain.User;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -16,10 +17,16 @@ import static org.junit.Assert.assertThat;
  */
 public class UserDaoTest {
 
+  private UserDao dao;
+
+  @Before
+  public void setUp() {
+    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+    this.dao = context.getBean("userDao", UserDao.class);
+  }
+
   @Test
   public void addAndGet() throws SQLException {
-    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
     User user1 = new User("no1", "홍길동", "pw01");
     User user2 = new User("no2", "임꺽정", "pw02");
 
@@ -41,9 +48,6 @@ public class UserDaoTest {
 
   @Test
   public void count() throws SQLException {
-    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
-
     User user1 = new User("no1", "홍길동", "pw01");
     User user2 = new User("no2", "임꺽정", "pw02");
     User user3 = new User("no3", "손오공", "pw03");
@@ -63,9 +67,6 @@ public class UserDaoTest {
 
   @Test(expected = SQLDataException.class)
   public void getUserFailure()throws SQLException {
-    ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
-
     dao.deleteAll();
     assertThat(dao.getCount(), is(0));
 
