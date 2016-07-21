@@ -9,7 +9,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -33,7 +32,7 @@ public class UserDaoTest {
   User user3 = new User("no3", "손오공", "pw03");
 
   @Test
-  public void addAndGet() throws SQLException {
+  public void addAndGet() {
     dao.deleteAll();
     assertThat(dao.getCount(), is(0));
 
@@ -49,7 +48,7 @@ public class UserDaoTest {
   }
 
   @Test
-  public void count() throws SQLException {
+  public void count() {
 
     dao.deleteAll();
     assertThat(dao.getCount(), is(0));
@@ -65,7 +64,7 @@ public class UserDaoTest {
   }
 
   @Test(expected = EmptyResultDataAccessException.class)
-  public void getUserFailure() throws SQLException {
+  public void getUserFailure() {
     dao.deleteAll();
     assertThat(dao.getCount(), is(0));
 
@@ -73,7 +72,7 @@ public class UserDaoTest {
   }
 
   @Test
-  public void getAllIdAscending() throws SQLException {
+  public void getAllIdAscending() {
     dao.deleteAll();
 
     dao.add(user1);
@@ -93,7 +92,7 @@ public class UserDaoTest {
   }
 
   @Test
-  public void getAllEmpty() throws SQLException {
+  public void getAllEmpty() {
     dao.deleteAll();
     List<User> users = dao.getAll();
 
