@@ -1,5 +1,6 @@
 package me.hotjoyit.user.dao;
 
+import me.hotjoyit.user.domain.Level;
 import me.hotjoyit.user.domain.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +29,9 @@ public class UserDaoTest {
   @Autowired
   private UserDao dao;
 
-  User user1 = new User("no1", "홍길동", "pw01");
-  User user2 = new User("no2", "임꺽정", "pw02");
-  User user3 = new User("no3", "손오공", "pw03");
+  User user1 = new User("no1", "홍길동", "pw01", Level.BASIC, login(1), recommend(0));
+  User user2 = new User("no2", "임꺽정", "pw02", Level.SILVER, login(55), recommend(10));
+  User user3 = new User("no3", "손오공", "pw03", Level.GOLD, login(100), recommend(40));
 
   @Test
   public void addAndGet() {
@@ -104,6 +105,9 @@ public class UserDaoTest {
     assertThat(user1.getId(), is(user2.getId()));
     assertThat(user1.getName(), is(user2.getName()));
     assertThat(user2.getPassword(), is(user2.getPassword()));
+    assertThat(user2.getLevel(), is(user2.getLevel()));
+    assertThat(user2.getLogin(), is(user2.getLogin()));
+    assertThat(user2.getRecommend(), is(user2.getRecommend()));
   }
 
   @Test(expected = DuplicateKeyException.class)
@@ -112,5 +116,13 @@ public class UserDaoTest {
 
     dao.add(user1);
     dao.add(user1);
+  }
+
+  private int login(int n) {
+    return n;
+  }
+
+  private int recommend(int n) {
+    return n;
   }
 }
