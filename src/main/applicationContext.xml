@@ -10,7 +10,7 @@
         <property name="password" value="pwhotjoyit" />
     </bean>
 
-    <bean id="userDao" class="me.hotjoyit.user.dao.UserDao">
+    <bean id="userDao" class="me.hotjoyit.user.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource" />
     </bean>
 </beans>
