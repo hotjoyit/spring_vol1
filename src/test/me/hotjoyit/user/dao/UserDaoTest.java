@@ -2,6 +2,7 @@ package me.hotjoyit.user.dao;
 
 import me.hotjoyit.user.domain.Level;
 import me.hotjoyit.user.domain.User;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,14 @@ public class UserDaoTest {
   private ApplicationContext context;
   @Autowired
   private UserDao dao;
+  private User user1, user2, user3;
 
-  User user1 = new User("no1", "홍길동", "pw01", Level.BASIC, login(1), recommend(0));
-  User user2 = new User("no2", "임꺽정", "pw02", Level.SILVER, login(55), recommend(10));
-  User user3 = new User("no3", "손오공", "pw03", Level.GOLD, login(100), recommend(40));
+  @Before
+  public void setUp() {
+    user1 = new User("no1", "홍길동", "pw01", Level.BASIC, login(1), recommend(0));
+    user2 = new User("no2", "임꺽정", "pw02", Level.SILVER, login(55), recommend(10));
+    user3 = new User("no3", "손오공", "pw03", Level.GOLD, login(100), recommend(40));
+  }
 
   @Test
   public void addAndGet() {
@@ -116,6 +121,26 @@ public class UserDaoTest {
 
     dao.add(user1);
     dao.add(user1);
+  }
+
+  @Test
+  public void update() {
+    dao.deleteAll();
+    dao.add(user1);
+    dao.add(user2); // 수정하지 않을 User
+
+    user1.setName("빙구");
+    user1.setPassword("빙구빙구");
+    user1.setLevel(Level.GOLD);
+    user1.setLogin(21124);
+    user1.setRecommend(31233);
+
+    dao.update(user1);
+    User updated = dao.get(user1.getId());
+    checkSameUser(updated, user1);
+
+    User notUpdated = dao.get(user2.getId());
+    checkSameUser(notUpdated, user2);
   }
 
   private int login(int n) {
