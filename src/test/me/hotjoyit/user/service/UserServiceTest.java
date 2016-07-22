@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import static me.hotjoyit.user.service.UserService.MIN_LOGIN_COUNT_FOR_SILVER;
 import static me.hotjoyit.user.service.UserService.MIN_RECOMMEND_COUNT_FOR_GOLD;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Created by hotjoyit on 2016-07-21
@@ -62,7 +64,7 @@ public class UserServiceTest {
   }
 
   @Test
-  public void upgradeLevels() {
+  public void upgradeLevels() throws SQLException {
     userDao.deleteAll();
 
     for (User user : users) {
@@ -84,5 +86,23 @@ public class UserServiceTest {
     } else {
       assertThat(userUpdated.getLevel(), is(user.getLevel()));
     }
+  }
+
+  @Test
+  public void upgradeAllOrNothing() throws SQLException {
+    UserService testUserService = new UserService.TestUserService(users.get(3).getId());
+    testUserService.setUserDao(this.userDao);
+    userDao.deleteAll();
+    for (User user : users) {
+      userDao.add(user);
+    }
+    try {
+      testUserService.upgradeLevels();
+      fail("TestUserServiceException expected");
+    } catch (UserService.TestUserServiceException e) {
+
+    }
+
+    checkLevelUpgraded(users.get(1), false);
   }
 }

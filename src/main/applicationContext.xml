@@ -12,6 +12,7 @@
 
     <bean id="userService" class="me.hotjoyit.user.service.UserService">
         <property name="userDao" ref="userDao" />
+        <property name="dataSource" ref="dataSource" />
     </bean>
     <bean id="userDao" class="me.hotjoyit.user.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource" />
