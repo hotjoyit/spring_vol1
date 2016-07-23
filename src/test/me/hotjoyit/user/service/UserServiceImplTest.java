@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,18 +69,21 @@ public class UserServiceImplTest {
 
   @Test
   public void upgradeLevels() throws SQLException {
-    userDao.deleteAll();
-
-    for (User user : users) {
-      userDao.add(user);
-    }
+    UserServiceImpl userService = new UserServiceImpl();
+    MockUserDao mockUserDao = new MockUserDao(users);
+    userService.setUserDao(mockUserDao);
 
     userService.upgradeLevels();
-    checkLevelUpgraded(users.get(0), false);
-    checkLevelUpgraded(users.get(1), true);
-    checkLevelUpgraded(users.get(2), false);
-    checkLevelUpgraded(users.get(3), true);
-    checkLevelUpgraded(users.get(4), false);
+
+    List<User> updated = mockUserDao.getUpdated();
+    assertThat(updated.size(), is(2));
+    checkUserAndLevel(updated.get(0), "joytouch", Level.SILVER);
+    checkUserAndLevel(updated.get(1), "madinite1", Level.GOLD);
+  }
+
+  private void checkUserAndLevel(User updated, String expectedId, Level expectedLevel) {
+    assertThat(updated.getId(), is(expectedId));
+    assertThat(updated.getLevel(), is(expectedLevel));
   }
 
   private void checkLevelUpgraded(User user, boolean upgraded) {
@@ -112,5 +116,49 @@ public class UserServiceImplTest {
     }
 
     checkLevelUpgraded(users.get(1), false);
+  }
+
+  static class MockUserDao implements UserDao {
+
+    private List<User> users;
+    private List<User> updated = new ArrayList<>();
+
+    private MockUserDao(List<User> users) {
+      this.users = users;
+    }
+
+    public List<User> getUpdated() {
+      return updated;
+    }
+
+    @Override
+    public List<User> getAll() {
+      return users;
+    }
+
+    @Override
+    public void update(User user) {
+      updated.add(user);
+    }
+
+    @Override
+    public void add(User user) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public User get(String id) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteAll() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getCount() {
+      throw new UnsupportedOperationException();
+    }
   }
 }
