@@ -10,11 +10,12 @@
         <property name="password" value="pwhotjoyit" />
     </bean>
 
-    <bean id="userService" class="me.hotjoyit.user.service.UserServiceTx">
-        <property name="userService" ref="userServiceImpl" />
+    <bean id="userService" class="me.hotjoyit.user.service.TxProxyFactoryBean">
+        <property name="target" ref="userServiceImpl" />
         <property name="transactionManager" ref="transactionManager" />
+        <property name="pattern" value="upgradeLevels" />
+        <property name="serviceInterface" value="me.hotjoyit.user.service.UserService" />
     </bean>
-
     <bean id="userServiceImpl" class="me.hotjoyit.user.service.UserServiceImpl">
         <property name="userDao" ref="userDao" />
     </bean>

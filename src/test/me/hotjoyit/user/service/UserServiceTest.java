@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,6 +38,8 @@ public class UserServiceTest {
   private UserService userService;
   @Autowired
   private PlatformTransactionManager transactionManager;
+  @Autowired
+  private ApplicationContext context;
 
   private List<User> users;
 
@@ -94,17 +98,14 @@ public class UserServiceTest {
   }
 
   @Test
-  public void upgradeAllOrNothing() throws SQLException {
-    UserServiceImpl.TestUserServiceImpl testUserServiceImpl = new UserServiceImpl.TestUserServiceImpl(users.get(3).getId());
-    testUserServiceImpl.setUserDao(this.userDao);
+  @DirtiesContext
+  public void upgradeAllOrNothing() throws Exception {
+    TestUserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(this.userDao);
 
-    TransactionHandler txHandler = new TransactionHandler();
-    txHandler.setTransactionManager(transactionManager);
-    txHandler.setTarget(testUserServiceImpl);
-    txHandler.setPattern("upgradeLevels");
-
-    UserService userServiceTx = (UserService)Proxy.newProxyInstance(
-        getClass().getClassLoader(), new Class[]{ UserService.class }, txHandler);
+    TxProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", TxProxyFactoryBean.class);
+    txProxyFactoryBean.setTarget(testUserService);
+    UserService userServiceTx = (UserService)txProxyFactoryBean.getObject();
 
     userDao.deleteAll();
     for (User user : users) {
@@ -113,11 +114,29 @@ public class UserServiceTest {
     try {
       userServiceTx.upgradeLevels();
       fail("TestUserServiceException expected");
-    } catch (UserServiceImpl.TestUserServiceException e) {
+    } catch (TestUserServiceException e) {
 
     }
 
     checkLevelUpgraded(users.get(1), false);
   }
 
+  static class TestUserService extends UserServiceImpl {
+    private String id;
+
+    public TestUserService(String id) {
+      this.id = id;
+    }
+
+    protected void upgradeLevel(User user) {
+      if (user.getId().equals(this.id)) {
+        throw new TestUserServiceException();
+      }
+      super.upgradeLevel(user);
+    }
+  }
+
+  static class TestUserServiceException extends RuntimeException {
+
+  }
 }
