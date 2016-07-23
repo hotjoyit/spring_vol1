@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/applicationContext.xml")
-public class UserServiceImplTest {
+public class UserServiceTest {
 
   @Autowired
   private UserDao userDao;
@@ -36,7 +37,7 @@ public class UserServiceImplTest {
   @Autowired
   private PlatformTransactionManager transactionManager;
 
-  List<User> users;
+  private List<User> users;
 
   @Before
   public void setUp() {
@@ -97,16 +98,20 @@ public class UserServiceImplTest {
     UserServiceImpl.TestUserServiceImpl testUserServiceImpl = new UserServiceImpl.TestUserServiceImpl(users.get(3).getId());
     testUserServiceImpl.setUserDao(this.userDao);
 
-    UserServiceTx userSerivceTx = new UserServiceTx();
-    userSerivceTx.setTransactionManager(transactionManager);
-    userSerivceTx.setUserService(testUserServiceImpl);
+    TransactionHandler txHandler = new TransactionHandler();
+    txHandler.setTransactionManager(transactionManager);
+    txHandler.setTarget(testUserServiceImpl);
+    txHandler.setPattern("upgradeLevels");
+
+    UserService userServiceTx = (UserService)Proxy.newProxyInstance(
+        getClass().getClassLoader(), new Class[]{ UserService.class }, txHandler);
 
     userDao.deleteAll();
     for (User user : users) {
       userDao.add(user);
     }
     try {
-      userSerivceTx.upgradeLevels();
+      userServiceTx.upgradeLevels();
       fail("TestUserServiceException expected");
     } catch (UserServiceImpl.TestUserServiceException e) {
 
