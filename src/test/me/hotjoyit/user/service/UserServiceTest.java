@@ -37,6 +37,8 @@ public class UserServiceTest {
   @Autowired
   private UserService userService;
   @Autowired
+  private UserService testUserService;
+  @Autowired
   private PlatformTransactionManager transactionManager;
   @Autowired
   private ApplicationContext context;
@@ -100,19 +102,12 @@ public class UserServiceTest {
   @Test
   @DirtiesContext
   public void upgradeAllOrNothing() throws Exception {
-    TestUserService testUserService = new TestUserService(users.get(3).getId());
-    testUserService.setUserDao(this.userDao);
-
-    ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService", ProxyFactoryBean.class);
-    txProxyFactoryBean.setTarget(testUserService);
-    UserService userServiceTx = (UserService)txProxyFactoryBean.getObject();
-
     userDao.deleteAll();
     for (User user : users) {
       userDao.add(user);
     }
     try {
-      userServiceTx.upgradeLevels();
+      testUserService.upgradeLevels();
       fail("TestUserServiceException expected");
     } catch (TestUserServiceException e) {
 
@@ -121,12 +116,13 @@ public class UserServiceTest {
     checkLevelUpgraded(users.get(1), false);
   }
 
-  static class TestUserService extends UserServiceImpl {
-    private String id;
+  @Test
+  public void advisorAutoProxyCreator() {
+    assertThat(testUserService, is(java.lang.reflect.Proxy.class));
+  }
 
-    public TestUserService(String id) {
-      this.id = id;
-    }
+  static class TestUserServiceImpl extends UserServiceImpl {
+    private String id = "madinite1";
 
     protected void upgradeLevel(User user) {
       if (user.getId().equals(this.id)) {
