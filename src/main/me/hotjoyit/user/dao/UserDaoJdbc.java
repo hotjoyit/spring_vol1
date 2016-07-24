@@ -2,6 +2,7 @@ package me.hotjoyit.user.dao;
 
 import me.hotjoyit.user.domain.Level;
 import me.hotjoyit.user.domain.User;
+import me.hotjoyit.user.sqlservice.SqlService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -15,6 +16,8 @@ import java.util.List;
  */
 public class UserDaoJdbc implements UserDao {
   private JdbcTemplate jdbcTemplate;
+
+  private SqlService sqlService;
 
   private RowMapper<User> userMapper = new RowMapper<User>() {
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -33,37 +36,40 @@ public class UserDaoJdbc implements UserDao {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
+  public void setSqlService(SqlService sqlService) {
+    this.sqlService = sqlService;
+  }
+
   @Override
   public void add(final User user) {
     jdbcTemplate.update(
-        "insert into users(id, name, password, level, login, recommend) values(?,?,?,?,?,?)"
+        sqlService.getSql("userAdd")
         , user.getId(), user.getName(), user.getPassword(), user.getLevel().intValue(), user.getLogin(), user.getRecommend());
   }
 
   @Override
   public User get(String id) {
-    return jdbcTemplate.queryForObject("select * from users where id = ?", new Object[]{id}, this.userMapper);
+    return jdbcTemplate.queryForObject(sqlService.getSql("userGet"), new Object[]{id}, this.userMapper);
   }
 
   @Override
   public void deleteAll() {
-    jdbcTemplate.update("delete from users");
+    jdbcTemplate.update(sqlService.getSql("userDeleteAll"));
   }
 
   @Override
   public int getCount() {
-    return jdbcTemplate.queryForInt("select count(*) from users");
+    return jdbcTemplate.queryForInt(sqlService.getSql("userGetCount"));
   }
 
   @Override
   public List<User> getAll() {
-    return jdbcTemplate.query("select * from users order by id", userMapper);
+    return jdbcTemplate.query(sqlService.getSql("userGetAll"), userMapper);
   }
 
   @Override
   public void update(User user) {
-    jdbcTemplate.update("update users set name = ?, password = ?, level = ?, login = ?, recommend = ? " +
-                        "where id = ?", user.getName(), user.getPassword(), user.getLevel().intValue()
+    jdbcTemplate.update(sqlService.getSql("userUpdate"), user.getName(), user.getPassword(), user.getLevel().intValue()
                           , user.getLogin(), user.getRecommend(), user.getId());
   }
 }
