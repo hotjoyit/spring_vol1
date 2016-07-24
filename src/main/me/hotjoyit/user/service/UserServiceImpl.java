@@ -4,6 +4,8 @@ import me.hotjoyit.user.dao.UserDao;
 import me.hotjoyit.user.domain.Level;
 import me.hotjoyit.user.domain.User;
 
+import java.util.List;
+
 /**
  * Created by hotjoyit on 2016-07-21
  */
@@ -23,6 +25,31 @@ public class UserServiceImpl implements UserService {
         upgradeLevel(user);
       }
     }
+  }
+
+  @Override
+  public User get(String id) {
+    return userDao.get(id);
+  }
+
+  @Override
+  public void deleteAll() {
+    userDao.deleteAll();
+  }
+
+  @Override
+  public int getCount() {
+    return userDao.getCount();
+  }
+
+  @Override
+  public List<User> getAll() {
+    return userDao.getAll();
+  }
+
+  @Override
+  public void update(User user) {
+    userDao.update(user);
   }
 
   protected void upgradeLevel(User user) {

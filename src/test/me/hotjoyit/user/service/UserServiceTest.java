@@ -6,9 +6,9 @@ import me.hotjoyit.user.domain.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -121,6 +121,11 @@ public class UserServiceTest {
     assertThat(testUserService, is(java.lang.reflect.Proxy.class));
   }
 
+  @Test(expected = TransientDataAccessException.class)
+  public void readOnlyTransactionAttribute() {
+    testUserService.getAll();
+  }
+
   static class TestUserServiceImpl extends UserServiceImpl {
     private String id = "madinite1";
 
@@ -129,6 +134,15 @@ public class UserServiceTest {
         throw new TestUserServiceException();
       }
       super.upgradeLevel(user);
+    }
+
+    @Override
+    public List<User> getAll() {
+      List<User> users = super.getAll();
+      for (User user : users) {
+        super.update(user);
+      }
+      return null;
     }
   }
 
