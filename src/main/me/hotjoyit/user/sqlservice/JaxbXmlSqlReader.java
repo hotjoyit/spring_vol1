@@ -13,7 +13,8 @@ import java.io.InputStream;
  * Created by hotjoyit on 2016-07-30
  */
 public class JaxbXmlSqlReader implements SqlReader {
-  private String sqlmapFile;
+  private static final String DEFAULT_SQLMAP_FILE = "sqlmap.xml";
+  private String sqlmapFile = DEFAULT_SQLMAP_FILE;
 
   public void setSqlmapFile(String sqlmapFile) {
     this.sqlmapFile = sqlmapFile;

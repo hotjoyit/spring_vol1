@@ -57,15 +57,6 @@
         <property name="sqlService" ref="sqlService" />
     </bean>
 
-    <bean id="sqlService" class="me.hotjoyit.user.sqlservice.BaseSqlService">
-        <property name="sqlReader" ref="sqlReader" />
-        <property name="sqlRegistry" ref="sqlRegistry" />
-    </bean>
-
-    <bean id="sqlReader" class="me.hotjoyit.user.sqlservice.JaxbXmlSqlReader">
-        <property name="sqlmapFile" value="sqlmap.xml" />
-    </bean>
-
-    <bean id="sqlRegistry" class="me.hotjoyit.user.sqlservice.HashMapSqlRegistry" />
+    <bean id="sqlService" class="me.hotjoyit.user.sqlservice.DefaultSqlService" />
 
 </beans>
