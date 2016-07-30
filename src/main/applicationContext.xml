@@ -58,6 +58,8 @@
     </bean>
 
     <bean id="sqlService" class="me.hotjoyit.user.sqlservice.XmlSqlService">
+        <property name="sqlReader" ref="sqlService" />
+        <property name="sqlRegistry" ref="sqlService" />
         <property name="sqlmapFile" value="sqlmap.xml" />
     </bean>
 
