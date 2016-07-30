@@ -57,6 +57,12 @@
         <property name="sqlService" ref="sqlService" />
     </bean>
 
-    <bean id="sqlService" class="me.hotjoyit.user.sqlservice.DefaultSqlService" />
+    <bean id="sqlService" class="me.hotjoyit.user.sqlservice.OxmSqlService">
+        <property name="unmarshaller" ref="unmarshaller" />
+    </bean>
+
+    <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="contextPath" value="me.hotjoyit.user.sqlservice.jaxb" />
+    </bean>
 
 </beans>
